@@ -11,6 +11,20 @@ public class Role {
 	private Long id;
 	@Column(nullable = false, length = 255)
 	private String name;
+	
+	
+	
+	
+	@Column(name="isdeleted",columnDefinition = "boolean default false")
+	private boolean isdeleted;
+
+	public boolean isIsdeleted() {
+		return isdeleted;
+	}
+
+	public void setIsdeleted(boolean isdeleted) {
+		this.isdeleted = isdeleted;
+	}
 
 	public Long getId() {
 		return id;

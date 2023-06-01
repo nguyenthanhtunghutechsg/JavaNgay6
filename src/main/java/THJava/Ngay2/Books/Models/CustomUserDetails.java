@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public class CustomUserDetails implements UserDetails {
 	private User user;
-	
 
 	public CustomUserDetails(User user) {
 		this.user = user;
@@ -25,6 +24,10 @@ public class CustomUserDetails implements UserDetails {
 			authorities.add(new SimpleGrantedAuthority(role.getName()));
 		}
 		return authorities;
+	}
+
+	public User getUser() {
+		return user;
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package THJava.Ngay2.Books.Security;
+package THJava.Ngay2.Books.Controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;

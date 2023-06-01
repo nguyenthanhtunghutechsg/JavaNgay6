@@ -52,6 +52,14 @@ public class FillData {
 		Category categoryEng = new Category(); 
 		categoryEng.setName("Tieng Anh");
 		categoryRepository.save(categoryEng);
+		Category categoryQTKD = new Category(); 
+		categoryQTKD.setName("Quan Tri Kinh Doanh");
+		categoryQTKD.setIsdeleted(true);
+		categoryRepository.save(categoryQTKD);
+		Category categoryTCKT = new Category(); 
+		categoryTCKT.setIsdeleted(true);
+		categoryTCKT.setName("Tai Chinh Ke Toan");
+		categoryRepository.save(categoryTCKT);
 
 		Book bookCNTT1 = new Book();
 		bookCNTT1.setTitle("Lap trinh web spring MVC");

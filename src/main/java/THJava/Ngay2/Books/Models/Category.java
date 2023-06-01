@@ -17,6 +17,16 @@ public class Category {
 	private String description;
 	@OneToMany(mappedBy = "category")
 	private List<Book> books;
+	@Column(name="isdeleted",columnDefinition = "boolean default false")
+	private boolean isdeleted;
+
+	public boolean isIsdeleted() {
+		return isdeleted;
+	}
+
+	public void setIsdeleted(boolean isdeleted) {
+		this.isdeleted = isdeleted;
+	}
 
 	public Long getId() {
 		return id;

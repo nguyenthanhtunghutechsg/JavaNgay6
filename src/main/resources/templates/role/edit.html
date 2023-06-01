@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="utf-8" />
+<title>Edit Role</title>
+<link rel="stylesheet" type="text/css"
+	href="/webjars/bootstrap/css/bootstrap.min.css" />
+<script type="text/javascript" src="/webjars/jquery/jquery.min.js"></script>
+<script type="text/javascript"
+	src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+	<header th:insert="layout/fragment.html :: header"> </header>
+	<div align="center" class="container">
+		<h1>Edit Role</h1>
+		<br />
+		<form th:action="@{/roles/save}" th:object="${role}" method="post">
+			<input type="hidden" th:field="*{id}">
+			<div class="col-6 mb-3">
+				<label class="col-sm-2 col-form-label">Role Name:</label> <input
+					class="form-control" type="text" th:field="*{name}" />
+			</div>
+			<button type="submit" class="btn btn-primary">Save</button>
+		</form>
+	</div>
+</body>
+</html>

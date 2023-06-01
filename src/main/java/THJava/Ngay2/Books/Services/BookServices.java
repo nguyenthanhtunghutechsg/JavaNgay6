@@ -5,6 +5,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import THJava.Ngay2.Books.Models.Book;
@@ -17,7 +18,10 @@ public class BookServices {
 	private BookRepository bookRepository;
 
 	public List<Book> listAll() {
-		return bookRepository.findAll();
+		return bookRepository.findAll(Sort.by("title").ascending());
+	}
+	public List<Book> listAllWithOutDelete() {
+		return bookRepository.findWithOutDelete();
 	}
 
 	public void save(Book product) {
@@ -29,6 +33,6 @@ public class BookServices {
 	}
 
 	public void delete(long id) {
-		bookRepository.deleteById(id);
+		bookRepository.deleteBookById(id);
 	}
 }

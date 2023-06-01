@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+<meta charset="utf-8" />
+<title>User List</title>
+<link rel="stylesheet" type="text/css"
+	href="/webjars/bootstrap/css/bootstrap.min.css" />
+<script type="text/javascript" src="/webjars/jquery/jquery.min.js"></script>
+<script type="text/javascript"
+	src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+	<header th:insert="layout/fragment.html :: header"> </header>
+	<div align="center" class="container">
+		<h1>User List</h1>
+		<div sec:authorize="hasAnyAuthority('ADMIN')">
+			<a href="/users/new">Create New User</a>
+		</div>
+		<br /> <br />
+		<table border="1" class="table table table-hover table-bordered">
+			<thead>
+				<tr class="text-center align-middle">
+					<th>User ID</th>
+					<th>UserName</th>
+					<th>Email</th>
+					<th>Photo</th>
+					<th>Role</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr class="text-center align-middle" th:each="user : ${users}">
+					<td th:text="${user.id}">User ID</td>
+					<td th:text="${user.username}">UserName</td>
+					<td th:text="${user.email}">Email</td>
+					<td><img class="img-thumbnail"				
+						th:src="@{${user.photosImagePath}}" /></td>
+					<td>
+						<div th:if="${user.roles != null && !user.roles.empty}">
+							<a th:href="@{'/roles/edit/'+${role.id}}"
+								th:each="role: ${user.roles}" th:text="${role.name}"
+								class="badge bg-primary"></a>
+						</div>
+					</td>
+					<td>
+						<div sec:authorize="hasAnyAuthority('ADMIN')">
+							<a th:href="@{'/users/edit/' + ${user.id}}">Edit</a>
+						</div>
+						<div sec:authorize="hasAuthority('ADMIN')">
+							<a th:href="@{'/users/delete/' + ${user.id}}">Delete</a>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>

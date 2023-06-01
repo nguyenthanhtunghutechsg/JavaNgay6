@@ -36,20 +36,20 @@ public class WebSecurityConfig {
 	}
 
 	@Bean
-	protected WebSecurityCustomizer webSecurityCustomizer() {
-		return web -> web.ignoring()
-				.antMatchers("/");
-	}
-
-	@Bean
 	protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		System.out.println("filter");
 		http.authorizeHttpRequests(requests -> requests
-				.antMatchers("/books/").hasAnyAuthority("USER", "CREATOR", "EDITOR", "ADMIN")
-				.antMatchers("/books/new")
-				.hasAnyAuthority("ADMIN", "CREATOR").antMatchers("/books/edit/**").hasAnyAuthority("ADMIN", "EDITOR")
-				.antMatchers("/books/delete/**").hasAuthority("ADMIN").anyRequest().authenticated())
-				.formLogin(login -> login.permitAll()).logout(logout -> logout.permitAll())
+				.antMatchers("/").permitAll()
+				.antMatchers("/webjars/**").permitAll()
+				.antMatchers("/forgot_password").permitAll()
+				.antMatchers("/reset_password").permitAll()
+				.antMatchers("/books/")
+				.hasAnyAuthority("USER", "CREATER", "EDITOR", "ADMIN")
+				.antMatchers("/books/new").hasAnyAuthority("ADMIN", "CREATER").antMatchers("/books/edit/**")
+				.hasAnyAuthority("ADMIN", "EDITOR").antMatchers("/books/delete/**").hasAuthority("ADMIN").anyRequest()
+				.authenticated())
+				.formLogin(login -> login.loginPage("/login").permitAll())
+				.logout(logout -> logout.permitAll())
 				.exceptionHandling(handling -> handling.accessDeniedPage("/403"));
 		return http.build();
 	}

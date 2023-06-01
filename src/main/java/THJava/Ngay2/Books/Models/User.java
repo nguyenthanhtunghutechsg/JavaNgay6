@@ -1,5 +1,6 @@
 package THJava.Ngay2.Books.Models;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,13 +19,50 @@ public class User {
 	private String email;
 	@Column(nullable = false, length = 255)
 	private String password;
+	@Column(nullable = true, length = 255)
+	private String photourl;
+	@Column(nullable = true, length = 255)
+	private String tokenforgotpassword;
+	@Column(nullable = true)
+	private LocalDateTime timeexpired;
 	private boolean enabled;
+	@Column(name = "isdeleted", columnDefinition = "boolean default false")
+	private boolean isdeleted;
+
+	public boolean isIsdeleted() {
+		return isdeleted;
+	}
+
+	public void setIsdeleted(boolean isdeleted) {
+		this.isdeleted = isdeleted;
+	}
+
+	public String getphotourl() {
+		return photourl;
+	}
+
+	public void setphotourl(String photourl) {
+		this.photourl = photourl;
+	}
+
+	public String gettokenforgotpassword() {
+		return tokenforgotpassword;
+	}
+
+	public void settokenforgotpassword(String tokenforgotpassword) {
+		this.tokenforgotpassword = tokenforgotpassword;
+	}
+
+	public LocalDateTime getTimeexpired() {
+		return timeexpired;
+	}
+
+	public void setTimeexpired(LocalDateTime timeexpired) {
+		this.timeexpired = timeexpired;
+	}
 
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinTable(
-			name = "users_roles", 
-			joinColumns = @JoinColumn(name = "user_id"), 
-			inverseJoinColumns = @JoinColumn(name = "role_id"))
+	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles;
 
 	public Long getId() {
@@ -66,6 +104,9 @@ public class User {
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
+	public boolean getEnabled() {
+		return enabled;
+	}
 
 	public Set<Role> getRoles() {
 		return roles;
@@ -74,13 +115,21 @@ public class User {
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
+
 	public void addRoles(Role role) {
 		this.roles.add(role);
 	}
+
 	public User() {
 		roles = new HashSet<>();
 	}
 
-	
+	@Transient
+	public String getPhotosImagePath() {
+		if (photourl == null || id == null)
+			return null;
+
+		return "/photos/" + id + "/" + photourl;
+	}
 
 }

@@ -15,6 +15,16 @@ public class Book {
 	private String author;
 	@Column(name = "price")
 	private Long price;
+	@Column(name="isdeleted",columnDefinition = "boolean default false")
+	private boolean isdeleted;
+	
+	
+	public boolean isIsdeleted() {
+		return isdeleted;
+	}
+	public void setIsdeleted(boolean isdeleted) {
+		this.isdeleted = isdeleted;
+	}
 	@ManyToOne
 	@JoinColumn(name = "category_id", nullable = false)
 	private Category category;
