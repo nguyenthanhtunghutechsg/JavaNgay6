@@ -6,13 +6,13 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.naming.factory.SendMailFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.repository.query.Param;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,20 +22,44 @@ import THJava.Ngay2.Books.Models.CustomUserDetails;
 import THJava.Ngay2.Books.Models.User;
 import THJava.Ngay2.Books.Services.RoleService;
 import THJava.Ngay2.Books.Services.UserService;
+import THJava.Ngay2.Books.Services.SendMailService;
 import THJava.Ngay2.Books.Utils.Utilities;
 import net.bytebuddy.utility.RandomString;
 
 @Controller
 @ComponentScan("THJava.Ngay2.Books")
+@ComponentScan("THJava.Ngay2.Books.Utils")
 public class AuthController {
 
-	@Autowired
-	private JavaMailSender javaMailSender;
 	@Autowired
 	private UserService userService;
 
 	@Autowired
 	private RoleService roleService;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private SendMailService sendMailService;
+
+	@GetMapping("/signup")
+	public String showSignupForm(Model model) {
+		model.addAttribute("user", new User());
+
+		return "auth/signup_form";
+	}
+
+	@PostMapping("/process_register")
+	public String processRegister(User user,HttpServletRequest request) throws UnsupportedEncodingException, MessagingException {
+		String encodedPassword = passwordEncoder.encode(user.getPassword());
+		user.setPassword(encodedPassword);
+		user.addRoles(roleService.getbyName("USER"));
+		user.setVerificationCode(RandomString.make(30));
+		// user.setEnabled(true);
+		userService.save(user);
+		sendMailService.sendVerificationEmail(user, Utilities.getSiteURL(request));
+
+		return "auth/register_success";
+	}
 
 	@GetMapping("/auth/me")
 	public String findMe(Authentication authentication, Model model) {
@@ -69,7 +93,7 @@ public class AuthController {
 		try {
 			userService.updateResetPasswordToken(token, email);
 			String resetPasswordLink = Utilities.getSiteURL(request) + "/reset_password?token=" + token;
-			sendEmail(email, resetPasswordLink);
+			sendMailService.sendEmailForgotPassword(email, resetPasswordLink);
 			model.addAttribute("message", "We have sent a reset password link to your email. Please check.");
 
 		} catch (UserNotFoundException ex) {
@@ -79,27 +103,6 @@ public class AuthController {
 		}
 
 		return "auth/forgot_password_form";
-	}
-
-	public void sendEmail(String recipientEmail, String link) throws MessagingException, UnsupportedEncodingException {
-		MimeMessage message = javaMailSender.createMimeMessage();
-		MimeMessageHelper helper = new MimeMessageHelper(message);
-
-		helper.setFrom("javaS5@cntt.com", "Tung NT");
-		helper.setTo(recipientEmail);
-
-		String subject = "Link password";
-
-		String content = "<p>Chao`,</p>" + "<p>You have requested to reset your password.</p>"
-				+ "<p>Click the link below to change your password:</p>" + "<p><a href=\"" + link
-				+ "\">Change my password</a></p>" + "<br>" + "<p>Ignore this email if you do remember your password, "
-				+ "or you have not made the request.</p>";
-
-		helper.setSubject(subject);
-
-		helper.setText(content, true);
-
-		javaMailSender.send(message);
 	}
 
 	@GetMapping("/reset_password")
@@ -133,6 +136,17 @@ public class AuthController {
 		}
 
 		return "auth/reset_password_form";
+	}
+
+	@GetMapping("/verify")
+	public String verifyUser(@Param("code") String code, Model model) {
+		if (userService.verify(code)) {
+			model.addAttribute("message", "Congratulations, your account has been verified.");
+		} else {
+			model.addAttribute("error", "Sorry, we could not verify account. It maybe already verified,\n"
+					+ "        or verification code is incorrect.");
+		}
+		return "auth/result_Verify_form";
 	}
 
 }

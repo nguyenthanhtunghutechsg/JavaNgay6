@@ -17,6 +17,13 @@ import THJava.Ngay2.Books.Services.UserDetailsServiceImpl;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
+	String[] pathArrayPermitAll = new String[] { "/", "/webjars/**",
+			"/forgot_password", "/reset_password", "/signup","/verify/**", "/process_register" };
+	String[] pathArrayView = new String[] { "/books/" };
+	String[] pathArrayNew = new String[] { "/books/new" };
+	String[] pathArrayDelete = new String[] { "/books/edit/**" };
+	String[] pathArrayUpdate = new String[] { "/books/delete/**" };
+
 	@Bean
 	protected BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -38,19 +45,14 @@ public class WebSecurityConfig {
 	@Bean
 	protected SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		System.out.println("filter");
-		http.authorizeHttpRequests(requests -> requests
-				.antMatchers("/").permitAll()
-				.antMatchers("/webjars/**").permitAll()
-				.antMatchers("/forgot_password").permitAll()
-				.antMatchers("/reset_password").permitAll()
-				.antMatchers("/books/")
-				.hasAnyAuthority("USER", "CREATER", "EDITOR", "ADMIN")
-				.antMatchers("/books/new").hasAnyAuthority("ADMIN", "CREATER").antMatchers("/books/edit/**")
-				.hasAnyAuthority("ADMIN", "EDITOR").antMatchers("/books/delete/**").hasAuthority("ADMIN").anyRequest()
-				.authenticated())
-				.formLogin(login -> login.loginPage("/login").permitAll())
-				.logout(logout -> logout.permitAll())
-				.exceptionHandling(handling -> handling.accessDeniedPage("/403"));
+		http.authorizeHttpRequests(requests -> requests.antMatchers(
+				pathArrayPermitAll).permitAll()
+				.antMatchers(pathArrayView).hasAnyAuthority("USER", "CREATER", "EDITOR", "ADMIN")
+				.antMatchers(pathArrayUpdate).hasAnyAuthority("ADMIN", "CREATER")
+				.antMatchers(pathArrayUpdate).hasAnyAuthority("ADMIN", "EDITOR")
+				.antMatchers(pathArrayDelete).hasAuthority("ADMIN").anyRequest().authenticated())
+				.formLogin(login -> login.loginPage("/login").defaultSuccessUrl("/").permitAll())
+				.logout(logout -> logout.permitAll()).exceptionHandling(handling -> handling.accessDeniedPage("/403"));
 		return http.build();
 	}
 

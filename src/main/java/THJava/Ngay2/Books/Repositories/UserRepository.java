@@ -9,8 +9,13 @@ import THJava.Ngay2.Books.Models.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 	@Query("SELECT u FROM User u WHERE u.username = :username")
 	public User getUserByUsername(@Param("username") String username);
+
 	@Query("SELECT u FROM User u WHERE u.email = :email")
-	public User getUserByEmail(@Param("email")String email);
+	public User getUserByEmail(@Param("email") String email);
+
 	@Query("SELECT u FROM User u WHERE u.tokenforgotpassword = :token")
-    public User getUserBytokenforgotpassword(String token);
+	public User getUserBytokenforgotpassword(String token);
+
+	@Query("SELECT u FROM User u WHERE u.verificationCode = :code")
+	public User findByVerificationCode(String code);
 }

@@ -39,7 +39,7 @@ public class CustomUserDetails implements UserDetails {
 	@Override
 	public String getUsername() {
 		// TODO Auto-generated method stub
-		return user.getUsername();
+		return "MR. "+user.getUsername();
 	}
 
 	@Override
@@ -65,5 +65,6 @@ public class CustomUserDetails implements UserDetails {
 		// TODO Auto-generated method stub
 		return user.isEnabled();
 	}
+	
 
 }

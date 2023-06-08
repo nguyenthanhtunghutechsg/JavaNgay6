@@ -13,6 +13,7 @@ public class User {
 	@Column(name = "user_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	@Column(nullable = false, length = 255)
 	private String username;
 	@Column(nullable = false, length = 255)
@@ -21,10 +22,38 @@ public class User {
 	private String password;
 	@Column(nullable = true, length = 255)
 	private String photourl;
+	public String getPhotourl() {
+		return photourl;
+	}
+
+	public void setPhotourl(String photourl) {
+		this.photourl = photourl;
+	}
+
+	public String getVerificationCode() {
+		return verificationCode;
+	}
+
+	public void setVerificationCode(String verificationCode) {
+		this.verificationCode = verificationCode;
+	}
+
+	public String getTokenforgotpassword() {
+		return tokenforgotpassword;
+	}
+
+	public void setTokenforgotpassword(String tokenforgotpassword) {
+		this.tokenforgotpassword = tokenforgotpassword;
+	}
+
+	@Column(name = "verification_code", length = 255)
+	private String verificationCode;
+
 	@Column(nullable = true, length = 255)
 	private String tokenforgotpassword;
 	@Column(nullable = true)
 	private LocalDateTime timeexpired;
+
 	private boolean enabled;
 	@Column(name = "isdeleted", columnDefinition = "boolean default false")
 	private boolean isdeleted;
@@ -104,6 +133,7 @@ public class User {
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
+
 	public boolean getEnabled() {
 		return enabled;
 	}

@@ -8,6 +8,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,8 +40,25 @@ public class BookController {
 	private CategoryService categoryService;
 
 	@GetMapping
-	public String viewAllBook(Model model) {
-		List<Book> listBook = bookServices.listAllWithOutDelete();
+	public String viewHomePage(Model model) {
+		return viewAllBook(model, 1, "id", "asc", " ");
+	}
+
+	@GetMapping("/page/{pageNum}")
+	public String viewAllBook(Model model, @PathVariable(name = "pageNum") int pageNum,
+			@Param("sortField") String sortField, @Param("sortType") String sortType,
+			@Param("keyword") String keyword) {
+		sortField = sortField==null?"id":sortField;
+		sortType = sortType==null?"asc":sortType;
+		Page<Book> page = bookServices.listAllWithOutDelete(pageNum, sortField, sortType, keyword);
+		List<Book> listBook = page.getContent();
+		model.addAttribute("currentPage", pageNum);
+		model.addAttribute("totalPages", page.getTotalPages());
+		model.addAttribute("totalItems", page.getTotalElements());
+		model.addAttribute("sortField", sortField);
+		model.addAttribute("sortType", sortType);
+		model.addAttribute("reverseSortType", sortType.equals("asc") ? "desc" : "asc");
+		model.addAttribute("keyword", keyword);
 		model.addAttribute("books", listBook);
 		return "book/index";
 	}
@@ -83,8 +102,8 @@ public class BookController {
 		}
 	}
 
-	@GetMapping("/export")
-	public void exportToCSV(HttpServletResponse response)
+	@GetMapping("/export/{pageNum}")
+	public void exportToCSV(HttpServletResponse response, @PathVariable(name = "pageNum") int pageNum)
 			throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
 		response.setContentType("text/csv");
 		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
@@ -94,16 +113,15 @@ public class BookController {
 		String headerValue = "attachment; filename=books_" + currentDateTime + ".csv";
 		response.setHeader(headerKey, headerValue);
 
-		List<Book> books = bookServices.listAll();
+		List<Book> books = bookServices.listAll(pageNum).getContent();
 
 		StatefulBeanToCsvBuilder<Book> builder = new StatefulBeanToCsvBuilder<Book>(response.getWriter())
 				.withQuotechar(CSVWriter.NO_QUOTE_CHARACTER).withSeparator(CSVWriter.DEFAULT_SEPARATOR)
 				.withOrderedResults(false);
 
 		Arrays.stream(Book.class.getDeclaredFields())
-				.filter(field -> !("id".equals(field.getName()) 
-						|| "title".equals(field.getName())|| "author".equals(field.getName())
-						|| "price".equals(field.getName())))
+				.filter(field -> !("id".equals(field.getName()) || "title".equals(field.getName())
+						|| "author".equals(field.getName()) || "price".equals(field.getName())))
 				.forEach(field -> builder.withIgnoreField(Book.class, field));
 
 		StatefulBeanToCsv<Book> writer = builder.build();
